@@ -155,7 +155,7 @@ Subscriber ImageTransport::subscribe(
   const TransportHints * transport_hints)
 {
   (void) tracked_object;
-  rmw_qos_profile_t custom_qos = rmw_qos_profile_default;
+  rmw_qos_profile_t custom_qos = rmw_qos_profile_sensor_data;
   custom_qos.depth = queue_size;
   return create_subscription(
     impl_->node_.get(), base_topic, callback,
