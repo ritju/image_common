@@ -133,9 +133,33 @@ Publisher::Publisher(
       param_base_name +
       ".enable_pub_plugins").get_value<std::vector<std::string>>();
   }
-  for (size_t i = 0; i < allowlist_vec.size(); ++i) {
-    allowlist.insert(allowlist_vec[i]);
+
+  auto image_transport_plugins_ = node->declare_parameter<std::vector<std::string>>(
+      "image_transport_plugins", std::vector<std::string>());
+  image_transport_plugins_ =
+      node->get_parameter(
+      "image_transport_plugins").get_value<std::vector<std::string>>();
+  for (size_t i = 0; i < image_transport_plugins_.size(); i++)
+  {
+    RCLCPP_INFO(node->get_logger(), "%s plugin will be loaded.", image_transport_plugins_[i].c_str());
   }
+
+  for (size_t i = 0; i < image_transport_plugins_.size(); i++)
+  {
+    auto plugin = image_transport_plugins_[i];
+    if (std::find(allowlist_vec.begin(), allowlist_vec.end(), plugin) != allowlist_vec.end())
+    {
+      allowlist.insert(plugin);
+      RCLCPP_INFO(node->get_logger(), "add plugin %s to pub list.", plugin.c_str());
+    }
+  }
+
+  // for (size_t i = 0; i < allowlist_vec.size(); ++i) {
+  //   allowlist.insert(allowlist_vec[i]);
+  //   RCLCPP_INFO(node->get_logger(), "plugin %s", allowlist_vec[i].c_str());
+  // }
+  // allowlist.clear();
+  // allowlist.insert("image_transport/ffmpeg");
 
   for (const auto & transport_name : allowlist) {
     const auto & lookup_name = transport_name + "_pub";
