@@ -144,13 +144,26 @@ Publisher::Publisher(
     RCLCPP_INFO(node->get_logger(), "%s plugin will be loaded.", image_transport_plugins_[i].c_str());
   }
 
-  for (size_t i = 0; i < image_transport_plugins_.size(); i++)
+  if (image_transport_plugins_.size() == 0)
   {
-    auto plugin = image_transport_plugins_[i];
-    if (std::find(allowlist_vec.begin(), allowlist_vec.end(), plugin) != allowlist_vec.end())
+    RCLCPP_INFO(node->get_logger(), "parameter image_transport_plugins was not set, using default value:image_transport/raw.");
+    allowlist.insert("image_transport/raw");
+  }
+  else
+  {
+    for (size_t i = 0; i < image_transport_plugins_.size(); i++)
     {
-      allowlist.insert(plugin);
-      RCLCPP_INFO(node->get_logger(), "add plugin %s to pub list.", plugin.c_str());
+      auto plugin = image_transport_plugins_[i];
+      if (std::find(allowlist_vec.begin(), allowlist_vec.end(), plugin) != allowlist_vec.end())
+      {
+        allowlist.insert(plugin);
+        RCLCPP_INFO(node->get_logger(), "add plugin %s to pub list.", plugin.c_str());
+      }
+    }
+    if (allowlist.size() == 0)
+    {
+      RCLCPP_INFO(node->get_logger(), "no valid plugin can be used. using default value:image_transport/raw.");
+      allowlist.insert("image_transport/raw");
     }
   }
 
