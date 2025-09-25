@@ -115,6 +115,7 @@ Publisher::Publisher(
   if (param_base_name.front() == '.') {
     param_base_name = param_base_name.substr(1);
   }
+  RCLCPP_INFO(node->get_logger(), "param_base_name:  %s", param_base_name.c_str());
   std::vector<std::string> allowlist_vec;
   std::set<std::string> allowlist;
   std::vector<std::string> all_transport_names;
@@ -134,11 +135,15 @@ Publisher::Publisher(
       ".enable_pub_plugins").get_value<std::vector<std::string>>();
   }
 
-  auto image_transport_plugins_ = node->declare_parameter<std::vector<std::string>>(
-      "image_transport_plugins", std::vector<std::string>());
-  image_transport_plugins_ =
-      node->get_parameter(
-      "image_transport_plugins").get_value<std::vector<std::string>>();
+  std::vector<std::string> image_transport_plugins_ = std::vector<std::string>();
+  if (!node->has_parameter(param_base_name + "image_transport_plugins"))
+  {
+    node->declare_parameter<std::vector<std::string>>(
+      param_base_name + ".image_transport_plugins", std::vector<std::string>());
+  }
+  image_transport_plugins_ = node->get_parameter(
+    param_base_name + ".image_transport_plugins").get_value<std::vector<std::string>>();
+  
   for (size_t i = 0; i < image_transport_plugins_.size(); i++)
   {
     RCLCPP_INFO(node->get_logger(), "%s plugin will be loaded.", image_transport_plugins_[i].c_str());
