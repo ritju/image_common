@@ -136,7 +136,7 @@ Publisher::Publisher(
   }
 
   std::vector<std::string> image_transport_plugins_ = std::vector<std::string>();
-  if (!node->has_parameter(param_base_name + "image_transport_plugins"))
+  if (!node->has_parameter(param_base_name + ".image_transport_plugins"))
   {
     node->declare_parameter<std::vector<std::string>>(
       param_base_name + ".image_transport_plugins", std::vector<std::string>());
